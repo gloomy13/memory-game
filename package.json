@@ -1,0 +1,21 @@
+{
+  "name": "memory-game",
+  "version": "1.0.0",
+  "description": "Memory card game",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gloomy13/memory-game.git"
+  },
+  "author": "gloomy13",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gloomy13/memory-game/issues"
+  },
+  "homepage": "https://github.com/gloomy13/memory-game#readme"
+}
