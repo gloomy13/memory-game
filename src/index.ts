@@ -1,23 +1,19 @@
+type CardMap = Record<string, Card>;
 class GameState {
     //pairs: Pair[];
-    cardMap?: Record<string, Card>;
+    // cardMap?: CardMap;
 
     constructor() {
         // this.pairs = this.generatePairs(16);
-        this.cardMap = this.generateCards(16);
-        if (this.cardMap) {
-            console.log(this.cardMap);
+        const cardMap: CardMap = this.generateCards(16);
+
+        if (cardMap) {
+            const gameEvents = new GameEvents(cardMap);
         }
-        this.init();
     }
 
-    init() {
-        document.addEventListener("DOMContentLoaded", () => this.renderCards());
-        document.addEventListener("DOMContentLoaded", hookFunctions);
-    }
-
-    generateCards(cardsCount: number): Record<string, Card> {
-        let cardMap: Record<string, Card> = {};
+    generateCards(cardsCount: number): CardMap {
+        let cardMap: CardMap = {};
         const columnsRowsCount: number = Math.sqrt(cardsCount);
         const pairsCount: number = cardsCount / 2;
 
@@ -50,7 +46,7 @@ class GameState {
             );
 
             // establish connection
-            new Pair(card1, card2, i);
+            new Pair(card1, card2, i.toString());
         }
 
         return cardMap;
@@ -73,6 +69,30 @@ class GameState {
 
         return availablePositions[randomIndex];
     }
+}
+
+class GameEvents {
+    cardMap: CardMap;
+    cardRevealed: boolean;
+    cardBack: string = 'T';
+
+    constructor(cardMap: CardMap) {
+        this.cardMap = cardMap;
+        this.cardRevealed = false;
+
+        document.addEventListener("DOMContentLoaded", () => this.renderCards());
+        document.addEventListener("DOMContentLoaded", () => this.hookFunctions());
+    }
+
+    // TODO function revealFirstCard
+    // TODO function revealSecondCard
+
+    hookFunctions() {
+        document.querySelectorAll(".card").forEach((card) => {
+            card.addEventListener("click", (e: Event) => this.cardClicked(e));
+        });
+        console.log('functions hooked');
+    }
 
     renderCards() {
         const container = document.querySelector(".cards-container");
@@ -83,29 +103,52 @@ class GameState {
             for (let i = 0; i < cardCount; i++) {
                 let column = Math.floor(i / columnsCount) + 1;
                 let row = (i % columnsCount) + 1;
-                container.innerHTML += `<div class="card w-32 h-32 flex m-auto items-center justify-center border border-black rounded cursor-pointer col-start-${column} row-start-${row}"><div>T</div></div>`;
+                container.innerHTML += `<div class="card w-32 h-32 flex m-auto items-center justify-center border border-black rounded cursor-pointer col-start-${column} row-start-${row}" x="${column - 1}" y="${row - 1}"><div class="card-content">T</div></div>`;
             }
         }
     }
-}
-// TODO function revealFirstCard
-// TODO function revealSecondCard
+    
+    cardClicked(e: Event) {
+        console.log('card clicked');
+        // TODO is back? is front? is first? is second?
+        const targetCardElement: HTMLElement = e.target as HTMLElement;
+        this.revealCard(targetCardElement);
+    }
+    
+    revealCard(cardElement: HTMLElement) {
+        // cardElement
+        const x: number = Number(cardElement.getAttribute('x'));
+        const y: number = Number(cardElement.getAttribute('y'));
 
-function hookFunctions() {
-    document.querySelectorAll(".card").forEach((card) => {
-        card.addEventListener("click", cardClicked);
-    });
-}
+        const position: Position = {x: x, y: y};
+        const card = this.cardMap[JSON.stringify(position)];
 
-function cardClicked(e: Event) {
-    // TODO is back? is front? is first? is second?
-    const targetCardElement: HTMLElement = e.target as HTMLElement;
-    console.log('card clicked');
-    revealACard(targetCardElement);
-}
+        if (!card) {
+            console.error("Card not found in map:", position);
+            return;
+        }
 
-function revealACard() {
-    console.log(this);    
+        const cardContent = card.pair?.content || "No content available";
+
+        const contentElement = cardElement.querySelector('.card-content');
+        
+        if (contentElement) {
+            contentElement.innerHTML = cardContent;
+        }
+
+        console.log('card revealed'); 
+        console.log(card);
+    }
+
+    hideCards() {
+        document.querySelectorAll(".card").forEach((card) => {
+            let cardContent = card.querySelector('.card-content');
+
+            if(cardContent) {
+                cardContent.innerHTML = this.cardBack;
+            }
+        });
+    }
 }
 
 /**
@@ -133,9 +176,9 @@ function removeElementFromPositionsArray(
 
 class Pair {
     cards: [Card, Card];
-    content: number;
+    content: string;
 
-    constructor(card1: Card, card2: Card, content: number) {
+    constructor(card1: Card, card2: Card, content: string) {
         this.cards = [card1, card2];
 
         card1.pair = this;
