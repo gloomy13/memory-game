@@ -1,8 +1,13 @@
 class GameState {
-    pairs: Pair[];
+    //pairs: Pair[];
+    cardMap?: Record<string, Card>;
 
     constructor() {
-        this.pairs = this.generatePairs(16);
+        // this.pairs = this.generatePairs(16);
+        this.cardMap = this.generateCards(16);
+        if (this.cardMap) {
+            console.log(this.cardMap);
+        }
         this.init();
     }
 
@@ -11,19 +16,22 @@ class GameState {
         document.addEventListener("DOMContentLoaded", hookFunctions);
     }
 
-    generatePairs(cardsCount: number) {
+    generateCards(cardsCount: number): Record<string, Card> {
+        let cardMap: Record<string, Card> = {};
         const columnsRowsCount: number = Math.sqrt(cardsCount);
         const pairsCount: number = cardsCount / 2;
 
         let availablePositions: Position[] =
             this.generateAllPossiblePositions(columnsRowsCount);
 
-        let pairs: Pair[] = [];
+        //let pairs: Pair[] = [];
 
         for (let i = 0; i < pairsCount; i++) {
             const card1Position: Position =
                 this.generateCardPosition(availablePositions);
             const card1: Card = new Card(card1Position);
+
+            cardMap[JSON.stringify(card1Position)] = card1;
 
             availablePositions = removeElementFromPositionsArray(
                 card1Position,
@@ -34,15 +42,18 @@ class GameState {
                 this.generateCardPosition(availablePositions);
             const card2: Card = new Card(card2Position);
 
+            cardMap[JSON.stringify(card2Position)] = card2;
+            
             availablePositions = removeElementFromPositionsArray(
                 card2Position,
                 availablePositions
             );
 
-            pairs.push(new Pair(card1, card2));
+            // establish connection
+            new Pair(card1, card2, i);
         }
 
-        return pairs;
+        return cardMap;
     }
 
     generateAllPossiblePositions(coulumnsCount: number): Position[] {
@@ -67,8 +78,9 @@ class GameState {
         const container = document.querySelector(".cards-container");
 
         if (container != undefined) {
-            const columnsCount = Math.sqrt(this.pairs.length * 2);
-            for (let i = 0; i < this.pairs.length * 2; i++) {
+            const cardCount = Object.keys(this.cardMap ?? {}).length;
+            const columnsCount = Math.sqrt(cardCount);
+            for (let i = 0; i < cardCount; i++) {
                 let column = Math.floor(i / columnsCount) + 1;
                 let row = (i % columnsCount) + 1;
                 container.innerHTML += `<div class="card w-32 h-32 flex m-auto items-center justify-center border border-black rounded cursor-pointer col-start-${column} row-start-${row}"><div>T</div></div>`;
@@ -85,9 +97,15 @@ function hookFunctions() {
     });
 }
 
-function cardClicked() {
+function cardClicked(e: Event) {
     // TODO is back? is front? is first? is second?
-    console.log('test');
+    const targetCardElement: HTMLElement = e.target as HTMLElement;
+    console.log('card clicked');
+    revealACard(targetCardElement);
+}
+
+function revealACard() {
+    console.log(this);    
 }
 
 /**
@@ -115,12 +133,15 @@ function removeElementFromPositionsArray(
 
 class Pair {
     cards: [Card, Card];
+    content: number;
 
-    constructor(card1: Card, card2: Card) {
+    constructor(card1: Card, card2: Card, content: number) {
         this.cards = [card1, card2];
 
         card1.pair = this;
         card2.pair = this;
+
+        this.content = content;
     }
 }
 
