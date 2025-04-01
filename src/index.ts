@@ -1,10 +1,6 @@
 type CardMap = Record<string, Card>;
 class GameState {
-    //pairs: Pair[];
-    // cardMap?: CardMap;
-
     constructor() {
-        // this.pairs = this.generatePairs(16);
         const cardMap: CardMap = this.generateCards(16);
 
         if (cardMap) {
@@ -73,19 +69,19 @@ class GameState {
 
 class GameEvents {
     cardMap: CardMap;
-    cardRevealed: boolean;
+    revealedCards: Card[] = [];
     cardBack: string = 'T';
+    overlay: HTMLElement = document.createElement("div");
 
     constructor(cardMap: CardMap) {
         this.cardMap = cardMap;
-        this.cardRevealed = false;
+
+        // add overlay classes
+        this.overlay.classList.add("w-screen", "h-screen", "absolute", "overlay", "top-0");
 
         document.addEventListener("DOMContentLoaded", () => this.renderCards());
         document.addEventListener("DOMContentLoaded", () => this.hookFunctions());
     }
-
-    // TODO function revealFirstCard
-    // TODO function revealSecondCard
 
     hookFunctions() {
         document.querySelectorAll(".card").forEach((card) => {
@@ -109,46 +105,106 @@ class GameEvents {
     }
     
     cardClicked(e: Event) {
-        console.log('card clicked');
-        // TODO is back? is front? is first? is second?
         const targetCardElement: HTMLElement = e.target as HTMLElement;
-        this.revealCard(targetCardElement);
-    }
-    
-    revealCard(cardElement: HTMLElement) {
-        // cardElement
-        const x: number = Number(cardElement.getAttribute('x'));
-        const y: number = Number(cardElement.getAttribute('y'));
 
-        const position: Position = {x: x, y: y};
-        const card = this.cardMap[JSON.stringify(position)];
-
-        if (!card) {
-            console.error("Card not found in map:", position);
+        // TODO check if card is already revealed
+        if(this.isCardRevealed(targetCardElement)) {
+            // TODO this doesnt work correctly
+            console.log("WHAT?!");
             return;
         }
 
-        const cardContent = card.pair?.content || "No content available";
+        this.revealCard(targetCardElement);
 
-        const contentElement = cardElement.querySelector('.card-content');
-        
-        if (contentElement) {
-            contentElement.innerHTML = cardContent;
+        if(this.revealedCards.length % 2 == 0){
+            document.body.appendChild(this.overlay);
+
+            if(!isPair([...this.revealedCards])) {
+                console.log("is not a pair");
+                this.revealedCards.splice(-2, 2);
+            }
+
+            setTimeout(() => {
+                document.body.removeChild(this.overlay);
+                this.hideCards();
+            },1000);
+        }
+    }
+
+    revealCard(cardElement: HTMLElement) {
+        if(cardElement.classList.contains("card-content")) {
+            // content clicked - set element to card
+            cardElement = cardElement.closest(".card") as HTMLElement;
         }
 
-        console.log('card revealed'); 
-        console.log(card);
+        const card = this.getCardByElement(cardElement);
+
+        if (!card) {
+            console.error("Card not found in map: " + cardElement);
+            return;
+        }
+
+        this.revealedCards.push(card);
+
+        const cardContent = card.pair?.content || "No content available";
+
+        let contentElement = cardElement.querySelector('.card-content');
+        
+        if(contentElement) {
+            contentElement.innerHTML = cardContent;
+        }
     }
 
     hideCards() {
-        document.querySelectorAll(".card").forEach((card) => {
-            let cardContent = card.querySelector('.card-content');
+        document.querySelectorAll(".card").forEach((cardElement) => {
+            if(cardElement) {
+                if(this.isCardRevealed(cardElement as HTMLElement)) {
+                    cardElement.classList.add("guessed-correctly");
+                    return;
+                }
+            }
+
+            let cardContent = cardElement.querySelector('.card-content');
 
             if(cardContent) {
                 cardContent.innerHTML = this.cardBack;
             }
         });
     }
+
+    isCardRevealed(cardElement: HTMLElement): boolean {
+        const card: Card = this.getCardByElement(cardElement as HTMLElement);
+
+        if(this.revealedCards.some((revealedCard: Card) => revealedCard.position == card.position)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    getCardByElement(cardElement: HTMLElement): Card {
+        const x: number = Number(cardElement.getAttribute("x"));
+        const y: number = Number(cardElement.getAttribute("y"));
+
+        const position: Position = {x: x, y: y};
+        const card = this.cardMap[JSON.stringify(position)];
+
+        return card;
+    }
+}
+
+function isPair(revealedCards: Card[]): boolean {
+    if(revealedCards.length < 2) {
+        return false;
+    }
+
+    const lastPair = revealedCards.splice(-2, 2);
+
+    if(lastPair[0].pair == lastPair[1].pair && lastPair[0].position != lastPair[1].position) {
+        return true;
+    }
+
+    return false;
 }
 
 /**

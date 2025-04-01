@@ -1,0 +1,4 @@
+.card.guessed-correctly {
+    background-color: rgb(162, 199, 145);
+    pointer-events: none;
+}
