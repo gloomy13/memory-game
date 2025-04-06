@@ -95,7 +95,7 @@ class GameEvents {
             for (let i = 0; i < cardCount; i++) {
                 let column = Math.floor(i / columnsCount) + 1;
                 let row = (i % columnsCount) + 1;
-                container.innerHTML += `<div class="card w-32 h-32 bg-green-600 flex m-auto items-center justify-center border border-black rounded cursor-pointer text-white text-2xl font-semibold col-start-${column} row-start-${row}" x="${column - 1}" y="${row - 1}"><div class="card-content"></div></div>`;
+                container.innerHTML += `<div class="card w-32 h-32 bg-green-600 flex m-auto items-center justify-center border border-black rounded-xl border-3 cursor-pointer text-white text-2xl font-semibold col-start-${column} row-start-${row}" x="${column - 1}" y="${row - 1}"><div class="card-content"></div></div>`;
             }
         }
     }
@@ -133,6 +133,8 @@ class GameEvents {
             cardElement = cardElement.closest(".card") as HTMLElement;
         }
 
+        cardElement.classList.add('revealed');
+
         const card = this.getCardByElement(cardElement);
 
         if (!card) {
@@ -154,8 +156,10 @@ class GameEvents {
     hideCards() {
         document.querySelectorAll(".card").forEach((cardElement) => {
             if(cardElement) {
+                cardElement.classList.remove('revealed');
+
                 if(this.isCardRevealed(cardElement as HTMLElement)) {
-                    cardElement.classList.add("guessed-correctly");
+                    cardElement.classList.add('guessed-correctly');
                     return;
                 }
             }

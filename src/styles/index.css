@@ -5,3 +5,7 @@
     opacity: 0.3;
     pointer-events: none;
 }
+
+.card.revealed {
+    border-color: #fff;
+}
