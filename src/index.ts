@@ -13,10 +13,7 @@ class GameState {
         const columnsRowsCount: number = Math.sqrt(cardsCount);
         const pairsCount: number = cardsCount / 2;
 
-        let availablePositions: Position[] =
-            this.generateAllPossiblePositions(columnsRowsCount);
-
-        //let pairs: Pair[] = [];
+        let availablePositions: Position[] = this.generateAllPossiblePositions(columnsRowsCount);
 
         for (let i = 0; i < pairsCount; i++) {
             const card1Position: Position =
@@ -30,8 +27,7 @@ class GameState {
                 availablePositions
             );
 
-            const card2Position: Position =
-                this.generateCardPosition(availablePositions);
+            const card2Position: Position = this.generateCardPosition(availablePositions);
             const card2: Card = new Card(card2Position);
 
             cardMap[JSON.stringify(card2Position)] = card2;
@@ -70,7 +66,7 @@ class GameState {
 class GameEvents {
     cardMap: CardMap;
     revealedCards: Card[] = [];
-    cardBack: string = 'T';
+    cardBack: string = '';
     overlay: HTMLElement = document.createElement("div");
 
     constructor(cardMap: CardMap) {
@@ -99,7 +95,7 @@ class GameEvents {
             for (let i = 0; i < cardCount; i++) {
                 let column = Math.floor(i / columnsCount) + 1;
                 let row = (i % columnsCount) + 1;
-                container.innerHTML += `<div class="card w-32 h-32 flex m-auto items-center justify-center border border-black rounded cursor-pointer col-start-${column} row-start-${row}" x="${column - 1}" y="${row - 1}"><div class="card-content">T</div></div>`;
+                container.innerHTML += `<div class="card w-32 h-32 bg-green-600 flex m-auto items-center justify-center border border-black rounded cursor-pointer text-white text-2xl font-semibold col-start-${column} row-start-${row}" x="${column - 1}" y="${row - 1}"><div class="card-content"></div></div>`;
             }
         }
     }

@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 .card.guessed-correctly {
-    background-color: rgb(162, 199, 145);
+    background-color: #344ac6;
+    opacity: 0.3;
     pointer-events: none;
 }
