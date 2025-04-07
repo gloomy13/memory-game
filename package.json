@@ -4,7 +4,11 @@
   "description": "Memory card game",
   "main": "index.js",
   "scripts": {
+<<<<<<< Updated upstream
     "build": "tsc",
+=======
+    "build": "tsc && npx @tailwindcss/cli -i ./assets/styles/index.css -o ./dist/styles/index.css --minified",
+>>>>>>> Stashed changes
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts"
   },
