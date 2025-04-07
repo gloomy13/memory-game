@@ -5,4 +5,4 @@ Memory card game in TypeScript.
 - points
 - start screen
 - end screen
-- styling
+- ~~styling~~
