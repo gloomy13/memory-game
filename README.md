@@ -15,11 +15,15 @@ Just clone the repository and run:
 3. Open `index.html` in your browser
 
 ### TODO
-- card contents
+- card contents (add graphics)
 - points (each guess costs...)
 - start screen
-    - mode select
     - play button
+    - mode select
+- modes
+    - time mode
+    - frenzy mode (cards are added when some pairs are guessed)
+- scoreboard
 - end screen
 - ~~styling~~
 
