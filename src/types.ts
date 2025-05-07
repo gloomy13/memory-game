@@ -1,0 +1,1 @@
+export type CardMap = Record<string, Card>;
