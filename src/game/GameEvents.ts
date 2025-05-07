@@ -1,3 +1,10 @@
+import { Card } from "../models/Card";
+import { Position } from "../models/Position";
+
+import { CardMap } from "../types";
+
+import { isPair } from "../utils/helpers";
+
 export class GameEvents {
     cardMap: CardMap;
     revealedCards: Card[] = [];

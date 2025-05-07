@@ -1,5 +1,13 @@
 import { GameEvents } from "./GameEvents";
 
+import { CardMap } from "../types";
+
+import { Position } from "../models/Position";
+import { Pair } from "../models/Pair";
+import { Card } from "../models/Card";
+
+import { removeElementFromPositionsArray } from "../utils/helpers";
+
 export class GameState {
     constructor() {
         const cardMap: CardMap = this.generateCards(16);
